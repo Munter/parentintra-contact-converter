@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CSV to vCard Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 p-8">
+    <div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md">
+      <h1 class="text-2xl font-bold mb-4">CSV to vCard Converter</h1>
+      <form
+        id="conversionForm"
+        method="POST"
+        action="/.netlify/functions/convert"
+      >
+        <div
+          id="dropzone"
+          class="border-2 border-dashed border-gray-300 p-6 text-center rounded-lg"
+        >
+          <input type="file" id="fileInput" accept=".csv" class="hidden" />
+          <label for="fileInput" class="cursor-pointer block">
+            <p class="text-gray-600">
+              Drag and drop CSV file or click to upload
+            </p>
+          </label>
+        </div>
+        <textarea
+          id="csvTextarea"
+          name="csvContent"
+          placeholder="Or paste CSV content here"
+          class="w-full border p-2 rounded h-40"
+        ></textarea>
+        <button
+          type="submit"
+          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full"
+        >
+          Convert to vCard
+        </button>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById("conversionForm");
+      const dropzone = document.getElementById("dropzone");
+      const fileInput = document.getElementById("fileInput");
+      const csvTextarea = document.getElementById("csvTextarea");
+
+      // Prevent default drag and drop behaviors
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, preventDefaults, false);
+      });
+
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      // Highlight dropzone on drag
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropzone.addEventListener(
+          eventName,
+          () => dropzone.classList.add("border-blue-500"),
+          false
+        );
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropzone.addEventListener(
+          eventName,
+          () => dropzone.classList.remove("border-blue-500"),
+          false
+        );
+      });
+
+      // Handle file drop
+      dropzone.addEventListener("drop", handleDrop, false);
+      fileInput.addEventListener("change", handleFiles, false);
+
+      function handleDrop(e) {
+        const files = e.dataTransfer.files;
+        processFile(files[0]);
+      }
+
+      function handleFiles() {
+        processFile(fileInput.files[0]);
+      }
+
+      function processFile(file) {
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          csvTextarea.value = e.target.result;
+          submitForm();
+        };
+        reader.readAsText(file);
+      }
+    </script>
+  </body>
+</html>
