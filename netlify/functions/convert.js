@@ -8,7 +8,7 @@ exports.handler = async (event) => {
   try {
     let csvContent = new URLSearchParams(event.body).get("csvContent");
 
-    const [firstLine, otherLines] = csvContent.split("\n");
+    const [firstLine, ...otherLines] = csvContent.split("\n");
 
     if (firstLine.startsWith("sep=")) {
       csvContent = otherLines.join("\n");
